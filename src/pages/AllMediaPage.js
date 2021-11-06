@@ -1,5 +1,6 @@
 import MediaList from "../components/media/MediaList";
 import { Row, Col, Card } from "react-bootstrap";
+import { useCallback, useEffect } from "react";
 
 const DUMMY_DATA =[
     {
@@ -70,6 +71,30 @@ const DUMMY_DATA =[
 ];
 
 function AllMediaPage() {
+    const { BlobServiceClient, AnonymousCredential  } = require("@azure/storage-blob");
+
+    const getMediaHandler= useCallback(async () => {
+        // Enter your storage account name and SAS
+        const account = process.env.REACT_APP_ACCOUNT_NAME || "";
+        const accountSas = process.env.REACT_APP_ACCOUNT_SAS || "";
+
+        // Use AnonymousCredential when url already includes a SAS signature
+        const anonymousCredential = new AnonymousCredential();
+
+        // List containers
+        const blobServiceClient = new BlobServiceClient(
+            // When using AnonymousCredential, following url should include a valid SAS or support public access
+            `https://${account}.blob.core.windows.net/${accountSas}`,
+            anonymousCredential
+        );
+        let i = 1;
+        for await (const container of blobServiceClient.listContainers()) {
+          console.log(`Container ${i++}: ${container.name}`);
+        }
+    },[]);
+    useEffect(() => {
+        getMediaHandler();
+    }, []);
     return (
     <section>
         <h1>Media Page</h1>

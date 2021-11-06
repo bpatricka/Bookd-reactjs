@@ -1,19 +1,15 @@
 import React, { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from "@azure/msal-react";
-import { loginRequest } from "./authConfig";
 import { PageLayout } from "./components/layout/PageLayout";
-import { ProfileData } from "./components/ProfileData";
 import { SignInButton } from "./components/SignInButton";
 import AllMediaPage from "./pages/AllMediaPage";
 import AdminPage from "./pages/AdminPage";
 import AccountPage from "./pages/AccountPage";
 import HomePage from "./pages/HomePage";
-import { callMsGraph } from "./graph";
-import Button from "react-bootstrap/Button";
 import "./styles/App.css";
 
-const MainContent = () => {    
+const MainContent = () => {
     return (
         <div className="App">
             <AuthenticatedTemplate>
