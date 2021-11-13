@@ -18,19 +18,19 @@ app.use(express.static('public'));
 
 app.use(express.json());
 app.use(cors());
-
+console.log(process.env);
 
 // Enter your storage account name and shared key
-const account = "bookdmedia";
-const accountKey = "JJ3Uf/b6KjT9KFS9IC047O/2YJoNeRqbhnhqem6TiN/nfcrbuoFOH0vXGV0mODDhtEA/ipUwEiO+jJx/q3ABSw==";
+const account = process.env.ACCOUNT_NAME;
+const accountKey = process.env.ACCOUNT_KEY;
 
 
 // TODO store these secure variables away
 const config = {
-  user: 'sadmin',
-  password: 'mypass123!',
-  server: 'bookddb.database.windows.net',
-  database: 'bookd-1',
+  user: process.env.SQL_DB,
+  password: process.env.PASSWD,
+  server: process.env.REACT_APP_DB_SN,
+  database: process.env.REACT_APP_SQL_DB,
   encrypt: true
 }
 
