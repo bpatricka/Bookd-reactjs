@@ -1,0 +1,13 @@
+
+.rcontainer{
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 10px;
+    list-style: none;
+}
+
+.rcontainerimg{
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+}

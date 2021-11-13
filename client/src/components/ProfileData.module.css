@@ -1,0 +1,45 @@
+.profilepic > img{
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+}
+
+.profilewrapper{
+    margin: 10px 10px 10px 10px;
+    padding: 10px;
+    display: flex;
+    list-style: none;
+    justify-content: space-between;
+    gap: 20px 10px;
+    background-color:#DDD;
+    min-width: 60vw;
+    flex-grow: unset;
+    border-radius: 20px;
+}
+
+.profilewrapper > li{
+    background-color: #EEE;
+    padding: 10px;
+    border-radius: 10px;
+    max-height: 100%;
+}
+
+.myrentct{
+    text-align: center;
+}
+
+.myrentwrap{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.profpanel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 60vw;
+    border-radius: 10px;
+}
+

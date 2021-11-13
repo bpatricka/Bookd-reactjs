@@ -1,0 +1,12 @@
+.ampheader{
+    text-align: center;
+}
+
+.stbanner{
+    display:flex;
+    justify-content: center;
+}
+
+.msbar{
+    width: 20vw;
+}

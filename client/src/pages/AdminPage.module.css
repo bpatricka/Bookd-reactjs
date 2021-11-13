@@ -1,0 +1,10 @@
+.admincontent{
+}
+
+.adminheader{
+    text-align: center;
+}
+.appevents{
+    display: flex;
+    justify-content: center;
+}

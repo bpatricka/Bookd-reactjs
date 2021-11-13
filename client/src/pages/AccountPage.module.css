@@ -1,0 +1,15 @@
+.pageheader{
+    text-align: center;
+}
+
+.acctcontent{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.rentwrapper{
+    min-width: 90vw;
+}

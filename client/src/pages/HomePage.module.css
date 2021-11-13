@@ -1,0 +1,26 @@
+.homecontent{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100vw 100vh;
+    z-index: 3333;
+    color:blanchedalmond;
+}
+
+.hboverlay{
+    background-color: black;
+    height: 100vh;
+    width: 100vw;
+    opacity: 0.8;
+}
+
+.homeimg{
+    background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Cat_selling_books%2C_Krasnodar%2C_Russia.jpg/640px-Cat_selling_books%2C_Krasnodar%2C_Russia.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100vw 100vh;
+    z-index: 33;
+}
