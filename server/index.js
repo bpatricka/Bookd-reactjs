@@ -28,8 +28,8 @@ const accountKey = process.env.ACCOUNT_KEY;
 const config = {
   user: process.env.SQL_DB,
   password: process.env.PASSWD,
-  server: process.env.REACT_APP_DB_SN,
-  database: process.env.REACT_APP_SQL_DB,
+  server: process.env.DB_SN,
+  database: process.env.SQL_DB,
   encrypt: true
 }
 
