@@ -18,7 +18,6 @@ app.use(express.static('public'));
 
 app.use(express.json());
 app.use(cors());
-console.log(process.env);
 
 // Enter your storage account name and shared key
 const account = process.env.ACCOUNT_NAME;
