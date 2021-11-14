@@ -69,7 +69,6 @@ export function RentalsContextProvider(props) {
         })
         .then((data) => {
             setUserRentals(data.map(rental => rental));
-            console.log(userRentals);
         });
     }
 
@@ -89,6 +88,7 @@ export function RentalsContextProvider(props) {
             })
             .then((data) => {
                 //event happened
+                console.log('media checked in.');
             });
     }
 

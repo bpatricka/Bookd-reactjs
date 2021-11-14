@@ -1,15 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import RentalsContext from "../../store/rentals-context";
 import { formatDate, addHours } from "../utils/DateHelp";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "react-bootstrap";
 
 export default function CountDownTimer(props){
-  const ntemp = '/account/rental/'+props.media_key;
   const rentalsCtx = useContext(RentalsContext);
   const d = addHours(new Date(props.due), 5);
   const r = new Date();
-  const navigate = useNavigate();
 
 
   const result = d-r <= 0 ? (rentalsCtx.checkinRental(), rentalsCtx.updateRentals(props.media_id)) : d-r;

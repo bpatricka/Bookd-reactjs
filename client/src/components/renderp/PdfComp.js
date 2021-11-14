@@ -1,62 +1,87 @@
-import { useCallback, useEffect, useState } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
+import React, { useEffect, useRef, useState } from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
+import { Button, ButtonGroup } from 'react-bootstrap'; 
+import classes from './PdfComp.module.css';
 
-export const PdfComp = (props) => {
+
+export default function PdfComp(props) {
+    const url =
+    "http://localhost:5000/account/rental/"+props.media_key;
+    pdfjs.GlobalWorkerOptions.workerSrc =
+    `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+    const [numPages, setNumPages] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [pageNumber, setPageNumber] = useState(1);
     const [tdata, setData] = useState(null);
-    
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+    const [tURL, setURL] =  useState(null);
+    const pdfRef = useRef();
+    const pnRef = useRef();
+    const btnRef = useRef();
 
-    const fetchRenderHandler = useCallback(async () =>{
-        let isMounted = true;
-        setLoading(true);
-
-        // //start error and data handling
-        try{
-            const response = await fetch(
-                props.url
-            );
-
-            if (!response.ok) {
-                throw new Error('Somethings wronnnggg...');
-            }
-            let temp = [];
-            const data = await response;
-            setData(data.map(chunk => chunk));
-            for (const item in data){
-                temp.push({...data[item]})
-            }
-            setData(temp);
-
-
-        }catch(error){
-            setError(error.message);
-        }
-        setLoading(false);
-    },[]);
-
-    useEffect(()=>{
-        let isMounted = true;
-        fetchRenderHandler()
-        return () => {
-            isMounted = false;
-        }
-    },[]);
-
-
-    let content;
-    if(loading){
-        content = <p>Loading...</p>
+        
+    /*When document gets loaded successfully*/
+    function onDocumentLoadSuccess({ numPages }) {
+        setNumPages(numPages);
+        setPageNumber(1);
     }
-    else{
-        content = <span><Document file={props.url}/></span>
+
+    function changePage(offset) {
+        setPageNumber(prevPageNumber => prevPageNumber + offset);
     }
+
+    function previousPage(e) {
+        changePage(-1);
+    }
+
+    function nextPage(e) {
+        changePage(1);
+    }
+
+    function handlePageReq(){
+        console.log(pnRef.current.value);
+    }
+
     return (
-        <div>
-            {content}
-        </div>
-    )
-}
+        <>
+        <div className="main" >        
+            <div className={classes.buttongroup}>
+                <div className="pagec">
+                    Page {pageNumber || (numPages ? 1 : '--')} of {numPages || '--'}
+                </div>
+                <div className="buttonc">
+                    <ButtonGroup>
+                        <Button
+                            type="button"
+                            disabled={pageNumber <= 1}
+                            onClick={(event) => previousPage(event)}
+                            className="Pre"  
+                        >
+                        Previous
+                        </Button>
+                        <Button
+                            type="button"
+                            disabled={pageNumber >= numPages}
+                            onClick={(event) => nextPage(event)}
+                        >
+                        Next
+                        </Button>
+                    </ButtonGroup>
+                </div>
+            </div>
+            <Document
+                file={url}
+                onLoadError={console.error}
+                onLoadSuccess={onDocumentLoadSuccess}
+                height={'200px'}
+                className={classes.pdfcanvas}
+            >
+                <span style={{ display: 'flex'}}>
+                <Page pageNumber={pageNumber} />
+                <Page pageNumber={pageNumber+1} />
+                </span>
+            </Document>
 
-export default PdfComp;
+        </div>
+        </>
+    );
+}

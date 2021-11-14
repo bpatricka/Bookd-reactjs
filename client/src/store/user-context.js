@@ -7,14 +7,17 @@ const UserContext = createContext({
     mail: null,
     id: null,
     gName: null,
+    registered: null,
     getUsername: (user) => {},
     getEmail: (ue) => {},
     getUID: (uid) => {},
     getGname: (gn) => {},
-    getUserDeets: () => {}
+    getUserDeets: () => {},
+    setUserRole: (user) => {}
 });
 
 export function UserContextProvider(props) {
+    const [role, setRole] = useState('user');
     const [username, setUsername] = useState(null);
     const [userEmail, setUseremail] = useState(null);
     const [userID, setUserid] = useState(null);
@@ -23,6 +26,7 @@ export function UserContextProvider(props) {
     useEffect(() => {
         if (userEmail === null || userEmail === 'undefined'){
             getUserDetails();
+            getSavedDetails();
         }
     },[]);
 
@@ -59,6 +63,18 @@ export function UserContextProvider(props) {
     function getGNHandler(gn){
         setGivenname(gn);
     }
+
+    function setRoleHandler(user){
+        setRole(user);
+    }
+
+    function getSavedDetails(user){
+        fetch('http://localhost:5000/newuser/'+userEmail)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+        });
+    }
     
 
     const context = {
@@ -70,7 +86,8 @@ export function UserContextProvider(props) {
         getEmail: getEmailHandler,
         getUID: getUIDHandler,
         getGname: getGNHandler,
-        getUserDeets: getUserDetails
+        getUserDeets: getUserDetails,
+        setUserRole: setRoleHandler
     };
 
     return (

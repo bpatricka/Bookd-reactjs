@@ -1,5 +1,8 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import RentalsContext from "../../store/rentals-context";
+import PdfComp from "../renderp/PdfComp";
+import VidComp from "../renderp/VidComp";
+import AudioComp from "../renderp/AudioComp";
 import classes from './MediaRender.module.css';
 
 export const MediaRender = (props) =>{ 
@@ -10,36 +13,15 @@ export const MediaRender = (props) =>{
     const [aktiv, setActive] = useState('none');
     const accordRef = useRef();
     const rentalsCtx = useContext(RentalsContext);
-
     
     /// we want to..... display media 
     // how... request media data from backend
     // then, render the media
 
-    console.log(props);
-
 
 
 
     useEffect(()=>{
-        if (!props.media_key){
-            rentalsCtx.getCurrent();
-        }
-        // try {
-        //     const response = await fetch(
-        //         'http://localhost:5000/account/rental/'+props.media_key
-        //     );
-        // //err
-        // } catch(error){
-        //     console.log(setError(error.message));
-        // }
-
-        // if (!response.ok){
-        //     throw new Error('Something went terribly wrong.');
-        // }
-
-        // const data = await response.json();
-
         return () => {
         }
     },[]);
@@ -52,13 +34,22 @@ export const MediaRender = (props) =>{
         }
     }
 
+    if (props.m_type === 'PRINT'){
+        content = <PdfComp media_key={props.media_key} />;
+    } else if (props.m_type === 'AUDIO'){
+        content = <AudioComp media_key={props.media_key} />;
+    } else if (props.m_type) {
+        content = <VidComp media_key={props.media_key} />;
+    }
+
+
     return (
         
-        <div id='media-card'>
+        <div className={classes.mediacard} id='media-card'>
             <button onClick={handleViewToggle} className={classes.accordion}>View Media</button>
             <div className={classes.panel} style={{display: aktiv}} ref={accordRef} id='media-body'>
-                <span>
-
+                <span style={{display: aktiv}}>
+                    {content}
                 </span>
                 <ul className={classes.mediadetails} >
                     <li className={classes.mediadeetsitems}>

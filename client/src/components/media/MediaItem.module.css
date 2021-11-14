@@ -1,0 +1,16 @@
+.mediaitem{
+    background-color: #CCC;
+    display: 'flex';
+    flex-direction: column;
+    justify-content: 'center';
+    align-content: center;
+    border-radius: 10;
+}
+
+.mediaitem>:last-child{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #DDD;
+}
+

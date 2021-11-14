@@ -1,5 +1,5 @@
-import React from "react";
-import { useContext } from "react";
+import React, { useEffect } from "react";
+import { useContext, useState } from "react";
 import { Card } from "react-bootstrap";
 import UserContext from "../store/user-context";
 import classes from "./ProfileData.module.css";
@@ -9,10 +9,39 @@ import classes from "./ProfileData.module.css";
  * @param props 
  */
 export const ProfileData = (props) => {
+    const [loading, setLoading] = useState(false);
+    const [prentalCount, setpRentalCount] = useState(null);
+    const [prCount, setprCount] = useState('0');
     const userCtx = useContext(UserContext);
-    return (
-        <div id="p-div">
-            <Card className={classes.profpanel}>
+
+    useEffect(() =>{
+        setLoading(true);
+        let isMounted = true;
+
+        fetch(
+            "http://localhost:5000/prof/"+userCtx.mail
+        )
+        .then((response) => {
+            return response.json();
+        })
+        .then((data) => {
+            if(isMounted){
+                setprCount(data.length);
+            } 
+        });
+        
+        setLoading(false);
+        return () => {
+            let isMounted = false;
+        }
+    },[]);
+
+    if (loading){
+        content = <p>Loading...</p>
+    }
+    else { 
+        content =
+        <div className={classes.profpanel}>
                 <ul className={classes.profilewrapper}>
                     <li className={classes.profilepic}>
                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Sleeping_cat_on_her_back.jpg/640px-Sleeping_cat_on_her_back.jpg" alt="" />
@@ -25,10 +54,15 @@ export const ProfileData = (props) => {
                     </li>
                     <li className={classes.myrentwrap}>
                         <p><strong>Rentals Made</strong></p>
-                        <p className={classes.myrentct}>4</p>
+                        <p className={classes.myrentct}>{prCount}</p>
                     </li>
                 </ul>
-            </Card>
+            </div>
+    }
+    
+    return (
+        <div id="p-div">
+            {content}
         </div>
     );
 };

@@ -1,6 +1,13 @@
-.pdf {
-    width: 612px;
-    height: 792px;
-    background-color: white;
-    margin: 0 auto;
+.buttongroup{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
+
+.pdfcanvas{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+

@@ -22,6 +22,7 @@ function AllMediaPage() {
     const rentalsCtx = useContext(RentalsContext);
     const searchCtx = useContext(SearchContext);
     let isMounted;
+
     //using a callback here for reactive search later
     const fetchMediaHandler = useCallback(async () => {
         isMounted = true;

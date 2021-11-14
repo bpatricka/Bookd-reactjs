@@ -27,7 +27,7 @@ const MainContent = () => {
             <AuthenticatedTemplate>
                 <Routes>
                     <Route path='/' exact element={<HomePage />}/>
-                    <Route path='/media' element={<AllMediaPage />}/>
+                    <Route path='/media' exact element={<AllMediaPage />}/>
                       <Route path="/media/:search" element={<AllMediaPage />} />
                     <Route path='/account' element={<AccountPage />}/>
                     <Route path='/admin' element={<AdminPage />}/>

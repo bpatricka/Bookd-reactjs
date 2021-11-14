@@ -19,7 +19,7 @@ const HomepageData = (props) => {
     const inputRef = useRef();
     const navigate = useNavigate();
 
-    function getProfData(){
+    async function getProfData(){
         let isMounted = true;
         setLoading(true);
         // Silently acquires an access token which is then attached to a request for MS Graph data
@@ -59,9 +59,8 @@ const HomepageData = (props) => {
         }
     }, []);
 
-    let content;
     if (loading){
-        content = <div>Just wait a moment...</div>
+        content = <p>Just wait a moment...</p>
     }
     else {
         content = 
