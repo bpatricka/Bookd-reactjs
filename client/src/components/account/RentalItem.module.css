@@ -1,14 +1,25 @@
 
 .rcontainer{
+    border-radius: 10px;
+    background-color: rgb(150, 150, 150);
     display: flex;
     justify-content: space-between;
-    padding: 10px 10px;
+    padding: 30px 30px;
     list-style: none;
-    padding-top: 0;
 }
 
 .rcontainerimg{
     width: 200px;
     height: 200px;
     border-radius: 10px;
+}
+
+.rcontainer>li:first-child{
+    padding: 0;
+}
+
+.rcontainer>li{
+    border-radius: 10px;
+    background-color: #AAA;
+    padding: 20px 20px;
 }

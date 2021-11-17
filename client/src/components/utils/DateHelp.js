@@ -16,6 +16,12 @@ export function addMinutes(date, minutes) {
     result.setMinutes(result.getMinutes() + minutes);
     return result
 }
+
+export function subHours(date, hours) {
+    let result = new Date(date);
+    result.setHours(result.getHours() - hours);
+    return result;
+}
   
 // date formatting for mssql format
 export function formatDate(date){

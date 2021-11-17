@@ -15,7 +15,7 @@ export const MediaItem = (props) => {
     const userCtx = useContext(UserContext);
 
     const itemIsRented = rentalsCtx.itemIsRented(props.media_id);
-
+    
     const { accounts } = useMsal();
 
     async function toggleRentStatusHandler(){

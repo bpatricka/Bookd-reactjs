@@ -1,6 +1,6 @@
 .accordion{
     background-color: #eee;
-    color: #444;
+    color: rgb(31, 32, 35);
     cursor: pointer;
     padding: 18px;
     width: 100%;
@@ -8,9 +8,12 @@
     border: none;
     outline: none;
     transition: 0.4s;
+    border-radius: 10px;
 }
 
 .mediacard{
+    background-color: rgb(150, 150, 150);
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -22,7 +25,6 @@
 }
 
 .panel{
-    background-color: white;
     display: none;
     overflow: hidden;
 }
@@ -32,5 +34,5 @@
 }
 
 .mediadeetsitems{
-
+    color: '#DDD';
 }

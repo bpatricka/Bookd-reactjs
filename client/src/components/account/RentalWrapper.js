@@ -4,7 +4,7 @@ import RentalList from './RentalList';
 import {Route, Link, Routes } from 'react-router-dom';
 import RentalsContext from '../../store/rentals-context';
 import UserContext from '../../store/user-context';
-import { useContext, useCallback, useState, useEffect } from 'react';
+import { useContext, useRef, useCallback, useState, useEffect } from 'react';
 import SearchContext from '../../store/search-context';
 import PdfComp from '../renderp/PdfComp';
 
@@ -15,6 +15,8 @@ export const RentalWrapper = () => {
     const [selected, setSelected] = useState('rentals');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const reserveRef = useRef();
+    const rentRef = useRef();
 
     let actives;
     let activer;
@@ -55,6 +57,14 @@ export const RentalWrapper = () => {
 
     function contentHandler(e) {
       setSelected(e.target.id);
+      if(e.target.id === 'rentals'){
+          rentRef.current.style.color='#888';
+          reserveRef.current.style.color='#DDD';
+      }
+      else {
+        rentRef.current.style.color='#DDD';
+        reserveRef.current.style.color='#888';
+      }
     }
 
     if (loading){
@@ -73,14 +83,14 @@ export const RentalWrapper = () => {
     }
 
     return (
-        <Card>
+        <Card bg='secondary' className={classes.rentalwrapper}>
             <Card.Header>
                 <Nav variant="tabs" defaultActiveKey="rentals">
                 <Nav.Item>
-                    <Nav.Link id={'rentals'} active={activer} onClick={(event) => {contentHandler(event)}}>Rentals</Nav.Link>
+                    <Nav.Link ref={rentRef} style={{ color: '#888'}} id={'rentals'} active={activer} onClick={(event) => {contentHandler(event)}}>Rentals</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                    <Nav.Link id={'reservations'} active={actives} onClick={(event) => {contentHandler(event)}}>Reservations</Nav.Link>
+                    <Nav.Link ref={reserveRef} style={{ color: '#DDD'}} id={'reservations'} active={actives} onClick={(event) => {contentHandler(event)}}>Reservations</Nav.Link>
                 </Nav.Item>
                 </Nav>
             </Card.Header>

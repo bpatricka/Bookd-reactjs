@@ -6,11 +6,11 @@ import MediaRender from './MediaRender';
 import { Link } from 'react-router-dom';
 
 export const RentalItem = (props) => {
-    let n = Date.parse(new Date()); //attach time when rented
+    console.log(props);
     //logic here for image retrieval and time left calculation
     return (
-        <Card>
-            <ul className={classes.rcontainer}>
+        <Card bg='secondary'>
+            <ul className={classes.rcontainer} style={{ color: '#333', fontSize: '20px'}}>
                 <li>
                     <img className={classes.rcontainerimg} src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Cat_yawning_in_park.jpg/640px-Cat_yawning_in_park.jpg'></img>
                 </li>
@@ -24,7 +24,7 @@ export const RentalItem = (props) => {
                     <p>{props.description}</p>
                 </li>
                 <li>
-                    <p>Time Left</p>
+                    <p style={{fontWeight: 'bold'}}>Time Left</p>
                     <div>
                         <CountDownTimer 
                             media_key={props.media_key}
@@ -33,9 +33,6 @@ export const RentalItem = (props) => {
                             due={props.returndate}
                         />
                     </div>
-                </li>
-                <li>
-                    
                 </li>
             </ul>
             <MediaRender 

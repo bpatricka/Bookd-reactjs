@@ -1,6 +1,6 @@
 import { useMsal } from "@azure/msal-react";
 import { createContext, useContext, useCallback, useEffect, useState } from "react";
-import { formatDate } from "../components/utils/DateHelp";
+import { formatDate, addHours, subHours, addMinutes } from "../components/utils/DateHelp";
 import { loginRequest, msalConfig } from "../authConfig";
 import UserContext from "./user-context";
 import { PublicClientApplication } from "@azure/msal-browser";
@@ -21,11 +21,14 @@ export function RentalsContextProvider(props) {
     const [userRentals, setUserRentals] = useState([]);
 
     useEffect(() => {
-        getCurrentRentals( !userCtx.mail ? userCtx.getUserDeets() : userCtx.mail );
+        getCurrentRentals( userCtx.mail );
         checkinRentalHandler();
     },[userRentals.length]);
 
     async function addRentalHandler(rentedMedia) {
+        const now = new Date();
+        const due = addMinutes(new Date(), 5);
+
         return fetch(
             'http://localhost:5000/media',
             {
@@ -42,7 +45,9 @@ export function RentalsContextProvider(props) {
             .then((data) => {
                 setUserRentals((prevUserRentals) => {
                     return prevUserRentals.concat({ ///add new rentals to our current
-                        ...rentedMedia
+                        ...rentedMedia,
+                        date_rented: now,
+                        date_returned: due
                     });
                 });
             });
@@ -58,8 +63,7 @@ export function RentalsContextProvider(props) {
     async function getCurrentRentals(u){
         // THIS IS FOR CURRENT RENTALS HARD RESET
         if(userCtx.mail === null || userCtx.mail === 'undefined') {
-            userCtx.getUserDeets();
-            u = sessionStorage.getItem('email');
+            return console.log('user not defined');
         }
         fetch(
             "http://localhost:5000/account/"+u,

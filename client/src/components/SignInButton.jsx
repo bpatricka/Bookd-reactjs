@@ -15,6 +15,6 @@ export const SignInButton = () => {
         });
     }
     return (
-        <Button variant="secondary" onClick={() => handleLogin()}>Sign In</Button>
+        <Button style={{width: '150px',height: '50px', display: 'flex', justifyContent:'space-evenly', alignItems: 'center'}} variant="primary" onClick={() => handleLogin()}>Sign In<img style={{ width: '30px', height: '30px', border: '3px', borderColor: 'black'}} src={'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Windows_logo_-_2012.svg/640px-Windows_logo_-_2012.svg.png'}></img></Button>
     )
 }

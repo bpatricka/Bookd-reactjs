@@ -3,35 +3,44 @@ const { BlobServiceClient, StorageSharedKeyCredential  } = require("@azure/stora
 const express = require("express");
 const cors = require("cors");
 const port = 5000;
-require("dotenv").config();
 const sql = require("mssql");
+// const multer = require('multer');
+// const formidable = require('express-formidable');
+// const upload = multer({dest: 'uploads/'});
+const fileUpload = require('express-fileupload');
+const { v1: uuidv1} = require('uuid');
 
-
+require('dotenv').config({path:'../.env'})
 /////////// init
 const app = express();
 const bodyParser = require('body-parser');
 const { response, request } = require("express");
 
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
-app.use(express.static('public'));
 
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(fileUpload());
+// app.use(formidable());
+// app.use(upload.array());
+app.use(express.static('public'));
 
 app.use(express.json());
 app.use(cors());
 
-// Enter your storage account name and shared key
-const account = process.env.ACCOUNT_NAME;
+const account = process.env.AACCOUNT_NAME;
 const accountKey = process.env.ACCOUNT_KEY;
 
-
-// TODO store these secure variables away
 const config = {
-  user: process.env.SQL_DB,
+  user: process.env.DBUSERNAME,
   password: process.env.PASSWD,
   server: process.env.DB_SN,
   database: process.env.SQL_DB,
   encrypt: true
 }
+
 
 /**
  * 
@@ -43,27 +52,44 @@ const config = {
  */
 
 
-// GET ALL MEDIA
-app.get('/media', (req,res) => {
-  // get media from SQL DB
-  getCurrentMedia();
-  function getCurrentMedia() {
-  
+app.get('/prof/:email', (req,res)=>{
+    email = req.params.email;
     // connect using config
     sql.connect(config, function (err) {
       if (err) {console.log(err);}
-  
+
       const request = new sql.Request();
-  
+      
+      // GET all prev rentals from that user
       request.query(
-        "SELECT * FROM [dbo].[media] m JOIN [dbo].[courses] c on m.course_id = c.course_id JOIN [dbo].[professors] p on p.prof_id = m.prof_id JOIN [dbo].[departments] d on d.dept_id = m.dept_id",
+        "SELECT * FROM [dbo].[rentals] r JOIN [dbo].[media] m on r.media_id = m.media_id WHERE r.checked_in = 1 AND r.email='"+email+"'",
         function (err, recordset) {
           if (err) console.log(err);
+          if (recordset.recordsets[0].length == 0){
+            console.log('no data');
+            return res.send('0');
+          }
           return res.send(recordset.recordsets[0]);
-        });
+        })
     });
-  }
+});
 
+
+// GET ALL MEDIA
+app.get('/media', (req,res) => {
+  // connect using config
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      "SELECT * FROM [dbo].[media] m JOIN [dbo].[courses] c on m.course_id = c.course_id JOIN [dbo].[professors] p on p.prof_id = m.prof_id JOIN [dbo].[departments] d on d.dept_id = m.dept_id",
+      function (err, recordset) {
+        if (err) console.log(err);
+        return res.send(recordset.recordsets[0]);
+      });
+  });
 });
 
 app.get('/media/:srch', (req,res) => {
@@ -201,10 +227,12 @@ app.get('/account/rental/:blob', (req, res)=>{
       let blobs = containerClient.listBlobsFlat();
       for await (const blob of blobs) { //iter
         if (blob.name == req.params.blob){ //match on user click
+          console.log('found media');
           const blockBlobClient = containerClient.getBlockBlobClient(blob.name);
           const downloadBlockBlobResponse = await blockBlobClient.download(0);
-          const downloaded = streamToBuffer(downloadBlockBlobResponse.readableStreamBody).toString();
-          console.log("Downloaded blob content:", downloaded);
+          // console.log('\nDownloaded blob content...');
+          // console.log('\t', await streamToString(downloadBlockBlobResponse.readableStreamBody));
+          res.send(await streamToBuffer(downloadBlockBlobResponse.readableStreamBody));
 
           
           // A helper method used to read a Node.js readable stream into a Buffer
@@ -220,6 +248,19 @@ app.get('/account/rental/:blob', (req, res)=>{
               readableStream.on("error", reject);
             });
           }
+
+          // async function streamToString(readableStream) {
+          //   return new Promise((resolve, reject) => {
+          //     const chunks = [];
+          //     readableStream.on("data", (data) => {
+          //       chunks.push(data.toString());
+          //     });
+          //     readableStream.on("end", () => {
+          //       resolve(chunks.join(""));
+          //     });
+          //     readableStream.on("error", reject);
+          //   });
+          // }
           
           listC().catch((err) => {
             console.error("Error running sample:", err.message);
@@ -232,6 +273,192 @@ app.get('/account/rental/:blob', (req, res)=>{
 });
 
 
+// INSERT NEW USER INTO THE DB
+app.get('/newuser/:email', (req, res)=>{
+  let temp = new Date();
+  let tempList = [];
+  console.log(req.params.email);
+  let init_q = "SELECT * FROM [dbo].[users] u where u.email = '"+req.params.email+"'";
+  let q = String("INSERT INTO [dbo].[users] VALUES ('"+(req.params.email).split('@')[0]+"', '"+req.params.email+"', 'user', '0', '0')");
+
+  // now logic for inserting rental into SQL DB
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      init_q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        // if the user doesnt exist in our DB
+        if (recordset.recordsets[0].length === 0 && req.params.email){
+          checkReg();
+        }
+        else{
+          console.log('User exists');
+          res.send(recordset.recordsets[0][0]);
+        }
+      }
+    );
+  });
+
+  function checkReg(){
+    // now logic for inserting rental into SQL DB
+    sql.connect(config, function (err) {
+      if (err) {console.log(err);}
+
+      const request = new sql.Request();
+
+      request.query(
+        q,
+        function (err, recordset) {
+          if (err) console.log(err);
+          return res.send(recordset);
+        }
+      );
+    });
+  }
+});
+
+
+app.get('/formdata', (req, res)=>{
+  let temp = [];
+  // connect using config
+  q = "SELECT * FROM [dbo].[professors]";
+  q1 = "SELECT * FROM [dbo].[courses]";
+  q2 = "SELECT * FROM [dbo].[departments]";
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        temp.push(recordset.recordsets);
+      });
+  });
+
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q1,
+      function (err, recordset) {
+        if (err) console.log(err);
+        temp.push(recordset.recordsets);
+      });
+  });
+
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q2,
+      function (err, recordset) {
+        if (err) console.log(err);
+        temp.push(recordset.recordsets);
+        res.send(temp);
+      });
+  });
+});
+
+app.post('/newmedia', function (req, res){
+  console.log(req.body);
+  console.log(req.files);
+
+  let temp = [];
+  let q = String("INSERT INTO [dbo].[media] VALUES ('"+req.body.media_key+"', '"+req.body.title+"', '"+req.body.author+"', '"+req.body.category+"', '"+req.body.prof_id+"', '"+req.body.course_id+"', '"+req.body.dept_id+"', '"+req.body.copies+"', '"+req.body.description+"', '"+req.body.publisher+"', '"+req.body.publishedDate+"', '"+req.body.m_type+"')");
+
+  //enter media into sql
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        console.log('Adding to SQL DB...');
+        temp.push(recordset.recordsets);
+      });
+  });
+
+  // upload media to blob storage
+  // Use StorageSharedKeyCredential with storage account and account key
+  // StorageSharedKeyCredential is only available in Node.js runtime, not in browsers
+  const sharedKeyCredential = new StorageSharedKeyCredential(account, accountKey);
+  const blobServiceClient = new BlobServiceClient(
+    `https://${account}.blob.core.windows.net`,
+    sharedKeyCredential
+  );
+
+  const containerName = uuidv1();
+
+  console.log('\nCreating container...');
+  console.log('\t'+containerName);
+
+  const containerClient = blobServiceClient.getContainerClient(containerName);
+
+  // create container
+  const createContainerResponse = containerClient.create();
+  console.log('Container created successfully.', createContainerResponse);
+
+  const blobName = req.body.media_key;
+
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+  console.log('\nUploading to Azure Blob Storage: ', blobName);
+
+  //upload data
+  const data = req.files.file.data;
+
+  const uploadBlobResponse = blockBlobClient.upload(data, data.length);
+  console.log('Blob successfully uploaded.', uploadBlobResponse);
+  res.send(temp);
+
+});
+
+// GET ALL USERS
+app.get('/users', (req, res)=>{
+  // connect using config
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      "SELECT * FROM [dbo].[users]",
+      function (err, recordset) {
+        if (err) console.log(err);
+        return res.send(recordset.recordsets[0]);
+      });
+  });
+});
+
+app.get('/reports/media', (req, res)=>{
+  // connect using config
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      "SELECT COUNT(r.rental_id) as rental_count, m.title FROM rentals r JOIN media m on r.media_id = m.media_id group by m.title order by rental_count",
+      function (err, recordset) {
+        if (err) console.log(err);
+        return res.send(recordset.recordsets[0]);
+      });
+  });
+});
+
 // HELPER FUNCTIONS FOR FORMATTING TO MSSQL
 function addDays(date, days) {
   let result = new Date(date);
@@ -242,6 +469,12 @@ function addDays(date, days) {
 function addMinutes(date, minutes) {
   let result = new Date(date);
   result.setMinutes(result.getMinutes() + minutes);
+  return result
+}
+
+function addHours(date, hours) {
+  let result = new Date(date);
+  result.setHours(result.getHours() + hours);
   return result
 }
 

@@ -7,10 +7,12 @@ import AllMediaPage from "./pages/AllMediaPage";
 import AdminPage from "./pages/AdminPage";
 import AccountPage from "./pages/AccountPage";
 import HomePage from "./pages/HomePage";
+import classes from "./styles/App.module.css";
 import "./styles/App.css";
 import MediaRender from "./components/account/MediaRender";
 import UserContext from "./store/user-context";
 import { loginRequest } from "./authConfig";
+import SplashPage from "./pages/SplashPage";
 
 const MainContent = () => {
     // needs logic to authenticate user role
@@ -21,6 +23,7 @@ const MainContent = () => {
     //       SET ACTIVEUSER IN USER CONTEXT 
     //       SET USER ROLE IN USER CONTEXT
     //
+
 
     return (
         <div className="App">
@@ -36,8 +39,7 @@ const MainContent = () => {
             </AuthenticatedTemplate>
 
             <UnauthenticatedTemplate>
-                <h5 className="card-title">This will be a splash page for Book'd.</h5>
-                <SignInButton />
+                <SplashPage />
             </UnauthenticatedTemplate>
         </div>
     );

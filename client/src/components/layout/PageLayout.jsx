@@ -1,9 +1,9 @@
 /*
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License.
+ * Copyright (c) Book'd. All rights reserved.
+ * Licensed under the GNU License.
  */
 
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { NavDropdown, Nav, Container, Navbar, Form, FormControl, Button, Badge, NavLink } from "react-bootstrap";
 import classes from "./PageLayout.module.css";
@@ -21,35 +21,29 @@ export const PageLayout = (props) => {
     const rentalsCtx = useContext(RentalsContext);
     const userCtx = useContext(UserContext);
     const isAuthenticated = useIsAuthenticated();
+    const audRef = useRef();
+    const vidRef = useRef();
+    const prntRef = useRef();
     const navigate = useNavigate();
-    //
-    async function checkUserExists(){
-        if (isAuthenticated) {
-            fetch('http://localhost:5000/newuser/'+userCtx.mail)
-                .then(response => response.json())
-                .then((data) => {
-                    //success or fail event
-                    console.log(data);
-                });
-        }
+
+    function handleANav(e){
+        console.log(e.target.id);
+        navigate(`/media/${e.target.id}`);
     }
 
-    useEffect(()=>{
-        checkUserExists();
-    }, []);
-
-
-    function handleANav(event){
-        console.log(event.target.id);
-        navigate(`/media/${event.target.id}`);
+    function handlePNav(e){
+        navigate(`/media/${e.target.id}`);
     }
 
-    function handlePNav(event){
-        navigate(`/media/${event.target.id}`);
+    function handleVNav(e){
+        navigate(`/media/${e.target.id}`);
     }
 
-    function handleVNav(event){
-        navigate(`/media/${event.target.id}`);
+    if(userCtx.role === 'admin'){
+        content = <NavDropdown.Item><Link to='/admin' className={classes.ddnavitems}>Admin</Link></NavDropdown.Item>;
+    }
+    else{
+        content = <NavDropdown.Item></NavDropdown.Item>;
     }
 
     return (
@@ -61,15 +55,15 @@ export const PageLayout = (props) => {
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav className="me-auto">
-                            <NavLink id='audio' onClick={(event) => handleANav(event)} className={classes.navitems}>Audio</NavLink>
-                            <NavLink id='print' onClick={(event) => handlePNav(event)} className={classes.navitems}>Print</NavLink>
-                            <NavLink id='video' onClick={(event) => handleVNav(event)} className={classes.navitems}>Video</NavLink>
+                            <NavLink ref={audRef} id='audio' onClick={(event) => handleANav(event)} className={classes.navitems}>Audio</NavLink>
+                            <NavLink ref={prntRef} id='print' onClick={(event) => handlePNav(event)} className={classes.navitems}>Print</NavLink>
+                            <NavLink ref={vidRef} id='video' onClick={(event) => handleVNav(event)} className={classes.navitems}>Video</NavLink>
                         </Nav>
                     <Nav>
                         <Badge variant='pill' style={{display: 'flex', zIndex:'33'}}>{rentalsCtx.rentals.length}</Badge>
                         <NavDropdown title="My Account" id="collasible-nav-dropdown">
                             <NavDropdown.Item><Link to='/account' className={classes.ddnavitems}>Account<Badge style={{zIndex:'33'}}><span style={{color: '#333' }}>{rentalsCtx.rentals.length}</span></Badge></Link></NavDropdown.Item>
-                            <NavDropdown.Item><Link to='/admin' className={classes.ddnavitems}>Admin</Link></NavDropdown.Item>
+                            {content}
                             <NavDropdown.Divider />
                             <NavDropdown.Item><SignOutButton /></NavDropdown.Item>
                         </NavDropdown>
@@ -78,7 +72,7 @@ export const PageLayout = (props) => {
                 </Container>
                 :
                 <Container>
-                    <Navbar.Brand><Link to='/' className={classes.brand}>Book'd</Link></Navbar.Brand>
+                    <div style={{height: '40px'}}></div>
                 </Container>
             }
             </Navbar>

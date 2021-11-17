@@ -4,7 +4,7 @@ import { formatDate, addHours } from "../utils/DateHelp";
 
 export default function CountDownTimer(props){
   const rentalsCtx = useContext(RentalsContext);
-  const d = addHours(new Date(props.due), 5);
+  const d = addHours(new Date(props.due), 5); //// fix for data from db
   const r = new Date();
 
 

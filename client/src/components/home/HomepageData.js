@@ -10,35 +10,13 @@ import { useNavigate, useLocation, Link, Navigate } from 'react-router-dom';
 import AllMediaPage from "../../pages/AllMediaPage";
 
 const HomepageData = (props) => {
-    const { instance, accounts } = useMsal();
-    const [graphData, setGraphData] = useState(null);
+    const { accounts } = useMsal();
     const [srch, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
     const userCtx = useContext(UserContext);
     const searchCtx = useContext(SearchContext);
     const inputRef = useRef();
     const navigate = useNavigate();
-
-    async function getProfData(){
-        let isMounted = true;
-        setLoading(true);
-        // Silently acquires an access token which is then attached to a request for MS Graph data
-        instance.acquireTokenSilent({
-            ...loginRequest,
-            account: accounts[0]
-        }).then((response) => {
-            callMsGraph(response.accessToken)
-            .then((response) => {
-                if(isMounted){
-                    userCtx.getUsername(response.userPrincipalName.split('@')[0])
-                    userCtx.getEmail(response.userPrincipalName)
-                    userCtx.getUID(response.id)
-                    userCtx.getGname(response.givenName+" "+response.surname) 
-                }
-            });
-        });
-        setLoading(false);
-    }
 
     function handleChange(e){
         setSearch(inputRef.current.value);
@@ -51,9 +29,14 @@ const HomepageData = (props) => {
 
     useEffect(() => {
         let isMounted = true;
-        if (!graphData){
-            getProfData();
+        setLoading(true);
+        if (userCtx.mail === null && isMounted){
+            userCtx.getEmail(accounts[0].username);
+            userCtx.getUID(accounts[0].localAccountId);
+            userCtx.getGname(accounts[0].name.split(',')[1]+" "+accounts[0].name.split(',')[0]);
+            userCtx.getUserDeets(accounts[0].username);
         }
+        setLoading(false);
         return () => {
             isMounted = false;
         }
@@ -74,9 +57,8 @@ const HomepageData = (props) => {
                     aria-label="search-area"
                     aria-describedby="main-search"
                 />
-                <Link to={location => ({ ...location, pathname: "/courses" })} />
 
-                <Button onClick={handleSubmit} variant="outline-secondary" id="button-addon2">
+                <Button onClick={handleSubmit} variant="outline-secondary" id="main-search">
                     Find it.
                 </Button>
             </InputGroup>

@@ -7,6 +7,7 @@ const UserContext = createContext({
     mail: null,
     id: null,
     gName: null,
+    role: null,
     registered: null,
     getUsername: (user) => {},
     getEmail: (ue) => {},
@@ -23,30 +24,8 @@ export function UserContextProvider(props) {
     const [userID, setUserid] = useState(null);
     const [givenName, setGivenname] = useState(null);
 
-    useEffect(() => {
-        if (userEmail === null || userEmail === 'undefined'){
-            getUserDetails();
-            getSavedDetails();
-        }
-    },[]);
-
-    function getUserDetails(){
-        // got to be a better way
-            for (const item in sessionStorage){
-                if (typeof sessionStorage[item] === 'string'){
-                    let temp = sessionStorage[item].split(",");
-                    for (const sitem in temp){
-                        for (const fitem in temp[sitem].split(':')[1]){
-                            if(temp[sitem].split(':')[1].endsWith('@southernct.edu"')){
-                                let t = temp[sitem].split(':')[1].replace('"','').replace('"','')
-                                sessionStorage.setItem('email', t);
-                                setUseremail(t);
-                            }
-                        }
-                    }
-                }
-            };
-        }
+    // useEffect(() => {
+    // },[]);
 
     function getUsernameHandler(data){
         setUsername(data);
@@ -64,30 +43,32 @@ export function UserContextProvider(props) {
         setGivenname(gn);
     }
 
-    function setRoleHandler(user){
+    function getRoleHandler(user){
         setRole(user);
     }
 
     function getSavedDetails(user){
-        fetch('http://localhost:5000/newuser/'+userEmail)
+        if (!user){return console.log('no user defined');}
+        fetch('http://localhost:5000/newuser/'+user)
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            setRole(data.role);
         });
     }
     
 
     const context = {
-        username: username,
+        username: userEmail ? userEmail.split('@')[0] : null ,
         mail: userEmail,
         id: userID,
         gName: givenName,
+        role: role,
         getUsername: getUsernameHandler,
         getEmail: getEmailHandler,
         getUID: getUIDHandler,
         getGname: getGNHandler,
-        getUserDeets: getUserDetails,
-        setUserRole: setRoleHandler
+        getUserDeets: getSavedDetails,
+        getUserRole: getRoleHandler
     };
 
     return (

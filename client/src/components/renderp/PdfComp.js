@@ -5,6 +5,7 @@ import classes from './PdfComp.module.css';
 
 
 export default function PdfComp(props) {
+    console.log(props.media_key);
     const url =
     "http://localhost:5000/account/rental/"+props.media_key;
     pdfjs.GlobalWorkerOptions.workerSrc =

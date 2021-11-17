@@ -1,0 +1,31 @@
+.bg{
+    display: flex;
+    position: relative;
+    justify-content: center;
+    background-image: url('../styles/buley-facade.png');
+    z-index: '-5';
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
+}
+
+.splashwrapper{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+}
+
+.bgol{
+    display: flex;
+    background-color: 'black';
+    z-index: '5';
+    opacity: '0.8';
+}
+
+.sibtn{
+    z-index: 2;
+    opacity: 1;
+}

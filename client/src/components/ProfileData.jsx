@@ -3,12 +3,14 @@ import { useContext, useState } from "react";
 import { Card } from "react-bootstrap";
 import UserContext from "../store/user-context";
 import classes from "./ProfileData.module.css";
+import { useMsal } from "@azure/msal-react";
 
 /**
  * Renders information about the user obtained from MS Graph
  * @param props 
  */
 export const ProfileData = (props) => {
+    const {intance, accounts} = useMsal();
     const [loading, setLoading] = useState(false);
     const [prentalCount, setpRentalCount] = useState(null);
     const [prCount, setprCount] = useState('0');
