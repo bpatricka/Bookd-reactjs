@@ -51,7 +51,7 @@ const config = {
  * 
  */
 
-
+//profile information
 app.get('/prof/:email', (req,res)=>{
     email = req.params.email;
     // connect using config
@@ -91,7 +91,7 @@ app.get('/media', (req,res) => {
       });
   });
 });
-
+// search criteria route
 app.get('/media/:srch', (req,res) => {
   // get media from SQL DB
   getCurrentMedia();
@@ -206,7 +206,7 @@ app.post('/media/checkin', (req, res)=> {
         })
     });
 });
-
+// data retrieval from blob storage
 app.get('/account/rental/:blob', (req, res)=>{
   // get media from blob storage
   // Use StorageSharedKeyCredential with storage account and account key
@@ -321,7 +321,7 @@ app.get('/newuser/:email', (req, res)=>{
   }
 });
 
-
+//formdata for management wrapper
 app.get('/formdata', (req, res)=>{
   let temp = [];
   // connect using config
@@ -369,9 +369,60 @@ app.get('/formdata', (req, res)=>{
   });
 });
 
+//formdata for management wrapper
+app.get('/formdata/prof', (req, res) => {
+  q2 = "SELECT * FROM [dbo].[professors]";
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q2,
+      function (err, recordset) {
+        if (err) console.log(err);
+        res.send(recordset.recordsets[0])
+      });
+  });
+});
+
+//formdata for management wrapper
+app.get('/formdata/course', (req, res) => {
+  q2 = "SELECT * FROM [dbo].[courses]";
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q2,
+      function (err, recordset) {
+        if (err) console.log(err);
+        res.send(recordset.recordsets[0])
+      });
+  });
+});
+
+//formdata for management wrapper
+app.get('/formdata/dept', (req, res) => {
+  q2 = "SELECT * FROM [dbo].[departments]";
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q2,
+      function (err, recordset) {
+        if (err) console.log(err);
+        res.send(recordset.recordsets[0])
+      });
+  });
+});
+
+
+//posting new media into the db
 app.post('/newmedia', function (req, res){
-  console.log(req.body);
-  console.log(req.files);
 
   let temp = [];
   let q = String("INSERT INTO [dbo].[media] VALUES ('"+req.body.media_key+"', '"+req.body.title+"', '"+req.body.author+"', '"+req.body.category+"', '"+req.body.prof_id+"', '"+req.body.course_id+"', '"+req.body.dept_id+"', '"+req.body.copies+"', '"+req.body.description+"', '"+req.body.publisher+"', '"+req.body.publishedDate+"', '"+req.body.m_type+"')");
@@ -387,7 +438,7 @@ app.post('/newmedia', function (req, res){
       function (err, recordset) {
         if (err) console.log(err);
         console.log('Adding to SQL DB...');
-        temp.push(recordset.recordsets);
+        temp.push(recordset);
       });
   });
 
@@ -422,7 +473,7 @@ app.post('/newmedia', function (req, res){
 
   const uploadBlobResponse = blockBlobClient.upload(data, data.length);
   console.log('Blob successfully uploaded.', uploadBlobResponse);
-  res.send(temp);
+  res.send(JSON.stringify(String('Confirmed')));
 
 });
 
@@ -443,6 +494,7 @@ app.get('/users', (req, res)=>{
   });
 });
 
+//media report for most popular rentals
 app.get('/reports/media', (req, res)=>{
   // connect using config
   sql.connect(config, function (err) {
@@ -451,13 +503,289 @@ app.get('/reports/media', (req, res)=>{
     const request = new sql.Request();
 
     request.query(
-      "SELECT COUNT(r.rental_id) as rental_count, m.title FROM rentals r JOIN media m on r.media_id = m.media_id group by m.title order by rental_count",
+      "SELECT COUNT(r.rental_id) as rental_count, m.title FROM rentals r JOIN media m on r.media_id = m.media_id group by m.title order by rental_count DESC",
       function (err, recordset) {
         if (err) console.log(err);
         return res.send(recordset.recordsets[0]);
       });
   });
 });
+
+//media report for most popular rentals
+app.get('/reports/users', (req, res)=>{
+  // connect using config
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      "SELECT COUNT(r.rental_id) as rental_count, u.email FROM rentals r JOIN users u on r.email = u.email group by u.email order by rental_count DESC",
+      function (err, recordset) {
+        if (err) console.log(err);
+        return res.send(recordset.recordsets[0]);
+      });
+  });
+});
+
+//posting for new professor
+app.post('/newprof', (req, res) => {
+  let q = String("INSERT INTO [dbo].[professors] VALUES ('"+req.body.fname+"', '"+req.body.lname+"', '"+req.body.dept+"')");
+
+  //enter media into sql
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        if (recordset.rowsAffected.length === 1){
+          console.log('Adding to SQL DB...');
+          res.send(JSON.stringify(String('Confirmed')));
+        } else {
+          res.send(JSON.stringify(String('Failed')));
+        }
+      });
+  });
+});
+//posting for new course
+app.post('/newcourse', (req, res) => {
+  let q = String("INSERT INTO [dbo].[courses] VALUES ('"+req.body.coursename+"', '"+req.body.courseDept+"', '"+req.body.courseProf+"')");
+
+  //enter media into sql
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        if (recordset.rowsAffected.length === 1){
+          console.log('Adding to SQL DB...');
+          res.send(JSON.stringify(String('Confirmed')));
+        } else {
+          res.send(JSON.stringify(String('Failed')));
+        }
+      });
+  });
+});
+//posting for new dept
+app.post('/newdept', (req, res) => {
+  
+  let q = String("INSERT INTO [dbo].[departments] VALUES ('"+req.body.deptname+"')");
+
+  //enter media into sql
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        if (recordset.rowsAffected.length === 1){
+          console.log('Adding to SQL DB...');
+          res.send(JSON.stringify(String('Confirmed')));
+        } else {
+          res.send(JSON.stringify(String('Failed')));
+        }
+      });
+  });
+});
+
+//posting to delete professor
+app.post('/delete/prof/:id', (req, res) => {
+  const q = String("DELETE FROM [dbo].[professors] WHERE prof_id ='"+req.params.id+"'");
+
+  //enter media into sql
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        if (recordset.rowsAffected.length === 1){
+          console.log('Adding to SQL DB...');
+          res.send(JSON.stringify(String('Confirmed')));
+        } else {
+          res.send(JSON.stringify(String('Failed')));
+        }
+      });
+  });
+});
+//posting to delete course
+app.post('/delete/course/:id', (req, res) => {
+  const q = String("DELETE FROM [dbo].[courses] WHERE course_id ='"+req.params.id+"'");
+
+  //enter media into sql
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        if (recordset.rowsAffected.length === 1){
+          console.log('Adding to SQL DB...');
+          res.send(JSON.stringify(String('Confirmed')));
+        } else {
+          res.send(JSON.stringify(String('Failed')));
+        }
+      });
+  });
+});
+//posting to delete dept
+app.post('/delete/dept/:id', (req, res) => {
+  const q = String("DELETE FROM [dbo].[departments] WHERE dept_id ='"+req.params.id+"'");
+
+  //enter media into sql
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        if (recordset.rowsAffected.length === 1){
+          console.log('Adding to SQL DB...');
+          res.send(JSON.stringify(String('Confirmed')));
+        } else {
+          res.send(JSON.stringify(String('Failed')));
+        }
+      });
+  });
+});
+//posting to delete media
+app.post('/delete/media/:mediakey', (req, res) => {
+  const q = String("DELETE FROM [dbo].[media] WHERE media_key ='"+req.params.mediakey+"'");
+
+  //enter media into sql
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        if (recordset.rowsAffected.length === 1){
+          console.log('Adding to SQL DB...');
+          res.send(JSON.stringify(String('Confirmed')));
+        } else {
+          res.send(JSON.stringify(String('Failed')));
+        }
+      });
+  });
+});
+
+//posting to edit professor
+app.post('/edit/prof/:id', (req, res)=>{
+  let q = String("UPDATE [dbo].[professors] SET fname = '"+req.body.fname+"', lname = '"+req.body.lname+"', dept_id ='"+req.body.dept+"' WHERE prof_id = '"+req.params.id+"'");
+
+  //enter media into sql
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        if (recordset.rowsAffected.length === 1){
+          console.log('Adding to SQL DB...');
+          res.send(JSON.stringify(String('Confirmed')));
+        } else {
+          res.send(JSON.stringify(String('Failed')));
+        }
+      });
+  });
+});
+//posting to edit dept
+app.post('/edit/dept/:id', (req, res)=>{
+  let q = String("UPDATE [dbo].[departments] SET dept_name = '"+req.body.name+"' WHERE dept_id = "+req.params.id);
+  //enter media into sql
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        if (recordset.rowsAffected.length === 1){
+          console.log('Adding to SQL DB...');
+          res.send(JSON.stringify(String('Confirmed')));
+        } else {
+          res.send(JSON.stringify(String('Failed')));
+        }
+      });
+  });
+});
+//posting to edit course
+app.post('/edit/course/:id', (req, res)=>{
+  let q = String("UPDATE [dbo].[courses] SET course_name = '"+req.body.name+"', dept_id = '"+req.body.dept+"', prof_id ='"+req.body.prof+"' WHERE course_id = '"+req.params.id+"'");
+
+  //enter media into sql
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        if (recordset.rowsAffected.length === 1){
+          console.log('Adding to SQL DB...');
+          res.send(JSON.stringify(String('Confirmed')));
+        } else {
+          res.send(JSON.stringify(String('Failed')));
+        }
+      });
+  });
+});
+//posting to edit professor
+app.post('/editmedia/:mediakey', (req, res) => {
+  
+  const q = String("UPDATE [dbo].[media] SET title = '"+req.body.title+"', author = '"+req.body.author+"', category = '"+req.body.category+"', prof_id ='"+req.body.prof_id+"', course_id='"+req.body.course_id+"', dept_id='"+req.body.dept_id+"', copies='"+req.body.copies+"', description='"+String(req.body.description)+"', publisher='"+req.body.publisher+"', publishedDate='"+req.body.publishDate+"', m_type='"+req.body.m_type+"' WHERE media_key ='"+req.params.mediakey+"'");
+  console.log(q);
+  //enter media into sql
+  sql.connect(config, function (err) {
+    if (err) {console.log(err);}
+
+    const request = new sql.Request();
+
+    request.query(
+      q,
+      function (err, recordset) {
+        if (err) console.log(err);
+        if (recordset.rowsAffected.length === 1){
+          console.log('Adding to SQL DB...');
+          res.send(JSON.stringify(String('Confirmed')));
+        } else {
+          res.send(JSON.stringify(String('Failed')));
+        }
+      });
+  });
+});
+
+
 
 // HELPER FUNCTIONS FOR FORMATTING TO MSSQL
 function addDays(date, days) {

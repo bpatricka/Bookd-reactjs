@@ -18,7 +18,8 @@ let bcontent;
         });
     }
 
-    const submitEdit = async () =>{
+    const submitEdit = async (e) =>{
+        e.preventDefault();
         let isMounted = true;
         fetch('http://localhost:5000/users',
             {
@@ -32,7 +33,6 @@ let bcontent;
 
     useEffect(()=>{
         let isMounted = true;
-        console.log(editing);
         if(users === null ){
             fetchUsersHandler();
         }
@@ -76,7 +76,7 @@ let bcontent;
             {acontent}
             {bcontent}
         </Form>
-        <Button style={{margin: '10px'}} variant='danger' onClick={submitEdit()}>BLOCK</Button>
+        <Button style={{margin: '10px'}} variant='danger' onSubmit={(event) => {submitEdit(event)}}>BLOCK</Button>
         </div>
     );
 }

@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Form, Row, Col, InputGroup, Button, FormSelect } from 'react-bootstrap';
-import context from 'react-bootstrap/esm/AccordionContext';
+import { Form, Row, Col, InputGroup, Button, Modal } from 'react-bootstrap';
 import classes from './AddMediaForm.module.css';
 const { v1: uuidv1} = require('uuid');
 
-function AddMediaForm() {
+function AddMediaForm(props) {
     const [validated, setValidated] = useState(false);
     const [dataArr, setDataArr] = useState(null);
     const [tdata, setData] = useState(null);
@@ -20,13 +19,23 @@ function AddMediaForm() {
     const [department, setDepartment] = useState(null);
     const [description, setDescription] = useState(null);
     const [myfile, setFile] = useState(null);
-    const [professors, setProfessors] = useState([1]);
-    const [courses, setCourses] = useState([1]);
-    const [departments, setDepartments] = useState([1]);
+    const [show, setShow] = useState(false);
+    const [ashow, setShowAlertS] = useState(false);
+    const [dshow, setShowAlertD] = useState(false);
     let fcontent;
+    let mcontent;
+    
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    const handleCloseAlertS = () => setShowAlertS(false);
+    const handleShowAlertS = () => setShowAlertS(true);
+
+    const handleCloseAlertD = () => setShowAlertD(false);
+    const handleShowAlertD = () => setShowAlertD(true);
 
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = (event) => {
       const form = event.currentTarget;
 
       if (form.checkValidity() === false) {
@@ -34,19 +43,22 @@ function AddMediaForm() {
         event.preventDefault();
         event.stopPropagation();
       }
-
       setValidated(true);
+      setShow(true);
+    }
+    
+    const handleConfirmSubmit = async () =>{
       if(validated){
-        console.log('validated');
+        handleClose();
 
-        let tmpdata = {
+        const tmpdata = {
           media_key: uuidv1(),
           title: title,
           author: author,
           category: category,
-          prof_id: 1,
-          course_id: 1,
-          dept_id: 1,
+          prof_id: professor,
+          course_id: course,
+          dept_id: department,
           copies: copies,
           description: description,
           publisher: publisher,
@@ -74,40 +86,19 @@ function AddMediaForm() {
               return response.json();
           })
           .then((data) => {
-            console.log(data);
+            if(data === 'Confirmed'){
+              setShowAlertS(true);
+            } else {
+              setShowAlertD(true);
+            }
           });
       }
     };
-
-    const fetchFormData = async () => {
-      let p= new Promise((res, rej) => {
-        res('http://localhost:5000/formdata/prof');
-      });
-      p.then(
-        new Promise((res, rej) => {
-          res('http://localhost:5000/formdata/course');
-        }).then(
-          new Promise((res,rej)=> {
-            res('http://localhost:5000/formdata/dept');
-          }).then((result3) =>{
-            console.log(result3);
-            setDepartments(result3);
-          })
-        ).then((result2) =>{
-          console.log(result2);
-          setCourses(result2);
-        })
-      )
-      .then((result1) => setProfessors(result1));
-    }
 
     useEffect(() => {
       let isMounted = true;
       // getFormValues();
       if (isMounted){
-        if (departments.length === 0){
-          fetchFormData();
-        }
       }
       return () => {
         isMounted = false;
@@ -134,8 +125,109 @@ function AddMediaForm() {
         </ul>
       </div>
     }
+
+
+    if(props.departments !== null){
+      mcontent = <div><Row>
+      <Form.Group as={Col} md="4" controlId="teacher">
+        <Form.Label>Professors</Form.Label>
+        <InputGroup hasValidation>
+          <Form.Control
+            as="select"
+            required
+            onChange={(event) => {setProfessor(event.target.value)}}
+          >
+            <option>Select to open...</option>
+            {props.professors.map((teacher) => 
+              <option value={teacher.prof_id}>{teacher.fname+" "+teacher.lname}</option>
+            )}
+          </Form.Control>
+        </InputGroup>
+      </Form.Group>
+    </Row>
+    <Row>
+      <Form.Group  as={Col} md="4" controlId="course">
+        <Form.Label>Courses</Form.Label>
+        <InputGroup hasValidation>            
+          <Form.Control
+            required
+            as="select"
+            onChange={(event) => {setCourse(event.target.value)}}
+          >
+            <option>Select to open...</option>
+            {props.courses.map((course) => 
+              <option value={course.course_id}>{course.course_name}</option>
+            )}
+          </Form.Control>
+        </InputGroup>
+      </Form.Group>
+    </Row>
+    <Row>
+      <Form.Group as={Col} md="4" controlId="dept">
+        <Form.Label>Departments</Form.Label>
+        <InputGroup hasValidation>            
+          <Form.Control
+            required
+            as="select"
+            onChange={(event) => {setDepartment(event.target.value)}}
+          >
+            <option>Select to open...</option>
+            {props.departments.map((dept) => 
+              <option value={dept.dept_id}>{dept.dept_name}</option>
+            )}
+          </Form.Control>
+        </InputGroup>
+      </Form.Group>
+    </Row>
+    </div>;
+    }
   
     return (
+      <section>
+        <span>
+        <Modal show={ashow} onHide={handleCloseAlertS}>
+            <Modal.Dialog>
+                <Modal.Header closeButton>
+                    <Modal.Title>Changes Successful</Modal.Title>
+                </Modal.Header>
+                <Modal.Footer>
+                    <Button variant='success' onClick={() => {handleCloseAlertS}}>Success</Button>
+                </Modal.Footer>
+            </Modal.Dialog>
+        </Modal>
+    </span>
+    <span>
+        <Modal show={dshow} onHide={handleCloseAlertD}>
+            <Modal.Dialog>
+                <Modal.Header closeButton>
+                    <Modal.Title>Changes Failed, please try again.</Modal.Title>
+                </Modal.Header>
+                <Modal.Footer>
+                    <Button variant='warning' onClick={() => {handleCloseAlertD}}>OK</Button>
+                </Modal.Footer>
+            </Modal.Dialog>
+        </Modal>
+    </span>
+    <span>
+        <Modal show={show} onHide={handleClose}>
+            <Modal.Dialog>
+                <Modal.Header closeButton>
+                    <Modal.Title>Submit Changes?</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    <p>By clicking Save Changes you are acknowledging and confirming changes.</p>
+                </Modal.Body>
+
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>Close</Button>
+                    <Button variant="primary" onClick={() => {
+                        handleConfirmSubmit();
+                    }}>Save changes</Button>
+                </Modal.Footer>
+            </Modal.Dialog>
+        </Modal>
+    </span>
       <Form 
         noValidate 
         validated={validated} 
@@ -201,6 +293,7 @@ function AddMediaForm() {
                         <div key={`inline-${type}`} className="mb-3">
                         <Form.Check
                             inline
+                            required
                             label="Audio"
                             value="AUDIO"
                             name="group1"
@@ -210,6 +303,7 @@ function AddMediaForm() {
                         />
                         <Form.Check
                             inline
+                            required
                             label="Print"
                             value="PRINT"
                             name="group1"
@@ -296,64 +390,15 @@ function AddMediaForm() {
             </Form>
           </Form.Group>
         </Row>
-    <Row>
-      <Form.Group as={Col} md="4" controlId="teacher">
-        <Form.Label>Professors</Form.Label>
-        <InputGroup hasValidation>            
-          <Form.Control
-            as="select"
-            required
-            onChange={(event) => {setProfessor(event.target.value)}}
-          >
-            <option>Select to open...</option>
-            {professors.map((teacher) => 
-              <option value={teacher.prof_id}>{teacher.fname+" "+teacher.lname}</option>
-            )}
-          </Form.Control>
-        </InputGroup>
-      </Form.Group>
-    </Row>
-    <Row>
-      <Form.Group  as={Col} md="4" controlId="course">
-        <Form.Label>Courses</Form.Label>
-        <InputGroup hasValidation>            
-          <Form.Control
-            required
-            as="select"
-            onChange={(event) => {setCourse(event.target.value)}}
-          >
-            <option>Select to open...</option>
-            {courses.map((course) => 
-              <option value={course.course_id}>{course.course_name}</option>
-            )}
-          </Form.Control>
-        </InputGroup>
-      </Form.Group>
-    </Row>
-    <Row>
-      <Form.Group as={Col} md="4" controlId="dept">
-        <Form.Label>Departments</Form.Label>
-        <InputGroup hasValidation>            
-          <Form.Control
-            required
-            as="select"
-            onChange={(event) => {setDepartment(event.target.value)}}
-          >
-            <option>Select to open...</option>
-            {departments.map((dept) => 
-              <option value={dept.dept_id}>{dept.dept_name}</option>
-            )}
-          </Form.Control>
-        </InputGroup>
-      </Form.Group>
-    </Row>
+                  {mcontent}
         <Form.Group className="mb-3" controlId="mediadescription">
             <Form.Label>Media Description</Form.Label>
             <InputGroup hasValidation>
                 <Form.Control 
                   as="textarea"  
                   placeholder='Enter a short description about the media...' 
-                  required rows={3} 
+                  required 
+                  rows={3} 
                   onChange={(event) => {setDescription(event.target.value)}}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -391,6 +436,7 @@ function AddMediaForm() {
         </Form.Group>
         <Button onClick={handleSubmit}>Submit form</Button>
       </Form>
+      </section>
     );
   }
   

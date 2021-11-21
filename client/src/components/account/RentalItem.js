@@ -6,13 +6,31 @@ import MediaRender from './MediaRender';
 import { Link } from 'react-router-dom';
 
 export const RentalItem = (props) => {
-    console.log(props);
-    //logic here for image retrieval and time left calculation
+    const[phimg, setPHImage] = useState(null);
+    const[image, setImage] = useState(null);
+    
+    function checkImage(){
+        if(props.m_type === 'PRINT'){
+            setImage('https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Documents_icon_-_noun_project_5020.svg/640px-Documents_icon_-_noun_project_5020.svg.png');
+            setPHImage('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Documents_icon_-_noun_project_5020_-_navy.svg/640px-Documents_icon_-_noun_project_5020_-_navy.svg.png')
+        } else if(props.m_type === 'VIDEO'){
+            setImage('https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Video_Camera_-_The_Noun_Project.svg/640px-Video_Camera_-_The_Noun_Project.svg.png');
+            setPHImage('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Icons8_flat_video_call.svg/640px-Icons8_flat_video_call.svg.png');
+        } else if(props.m_type === 'AUDIO'){
+            setImage('https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Audio_Max_%2889635%29_-_The_Noun_Project.svg/640px-Audio_Max_%2889635%29_-_The_Noun_Project.svg.png');
+            setPHImage('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Icons8_flat_speaker.svg/640px-Icons8_flat_speaker.svg.png');
+        }
+    }
+
+    useEffect(() => {
+        checkImage();
+    },[]);
+
     return (
         <Card bg='secondary'>
             <ul className={classes.rcontainer} style={{ color: '#333', fontSize: '20px'}}>
                 <li>
-                    <img className={classes.rcontainerimg} src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Cat_yawning_in_park.jpg/640px-Cat_yawning_in_park.jpg'></img>
+                    <img className={classes.rcontainerimg} src={phimg}></img>
                 </li>
                 <li>
                     <p>{props.title}</p>

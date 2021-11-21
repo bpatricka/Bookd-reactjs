@@ -1,9 +1,6 @@
-import { useMsal } from "@azure/msal-react";
 import { createContext, useContext, useCallback, useEffect, useState } from "react";
 import { formatDate, addHours, subHours, addMinutes } from "../components/utils/DateHelp";
-import { loginRequest, msalConfig } from "../authConfig";
 import UserContext from "./user-context";
-import { PublicClientApplication } from "@azure/msal-browser";
 
 const RentalsContext = createContext({
     rentals: [],

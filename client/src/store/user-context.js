@@ -14,7 +14,7 @@ const UserContext = createContext({
     getUID: (uid) => {},
     getGname: (gn) => {},
     getUserDeets: () => {},
-    setUserRole: (user) => {}
+    getUserRole: (user) => {}
 });
 
 export function UserContextProvider(props) {
@@ -43,8 +43,8 @@ export function UserContextProvider(props) {
         setGivenname(gn);
     }
 
-    function getRoleHandler(user){
-        setRole(user);
+    function getRoleHandler(role){
+        setRole(role);
     }
 
     function getSavedDetails(user){

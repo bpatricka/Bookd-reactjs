@@ -12,6 +12,7 @@ import { SignInButton } from "../SignInButton";
 import { SignOutButton } from "../SignOutButton";
 import RentalsContext from "../../store/rentals-context";
 import UserContext from '../../store/user-context';
+import SearchContext from '../../store/search-context';
 
 /**
  * Renders the navbar component with a sign-in or sign-out button depending on whether or not a user is authenticated
@@ -20,6 +21,7 @@ import UserContext from '../../store/user-context';
 export const PageLayout = (props) => {
     const rentalsCtx = useContext(RentalsContext);
     const userCtx = useContext(UserContext);
+    const searchCtx = useContext(SearchContext);
     const isAuthenticated = useIsAuthenticated();
     const audRef = useRef();
     const vidRef = useRef();
@@ -27,16 +29,22 @@ export const PageLayout = (props) => {
     const navigate = useNavigate();
 
     function handleANav(e){
-        console.log(e.target.id);
-        navigate(`/media/${e.target.id}`);
+        searchCtx.getSearch(e.target.id);
+        navigate(`/media/${searchCtx.search}`);
+    }
+
+    function handleAllNav(e){
+        navigate(`/media`);
     }
 
     function handlePNav(e){
-        navigate(`/media/${e.target.id}`);
+        searchCtx.getSearch(e.target.id);
+        navigate(`/media/${searchCtx.search}`);
     }
 
     function handleVNav(e){
-        navigate(`/media/${e.target.id}`);
+        searchCtx.getSearch(e.target.id);
+        navigate(`/media/${searchCtx.search}`);
     }
 
     if(userCtx.role === 'admin'){
@@ -55,6 +63,7 @@ export const PageLayout = (props) => {
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav className="me-auto">
+                            <NavLink ref={audRef} id='allmedia' onClick={(event) => handleAllNav(event)} className={classes.navitems}>All</NavLink>
                             <NavLink ref={audRef} id='audio' onClick={(event) => handleANav(event)} className={classes.navitems}>Audio</NavLink>
                             <NavLink ref={prntRef} id='print' onClick={(event) => handlePNav(event)} className={classes.navitems}>Print</NavLink>
                             <NavLink ref={vidRef} id='video' onClick={(event) => handleVNav(event)} className={classes.navitems}>Video</NavLink>
