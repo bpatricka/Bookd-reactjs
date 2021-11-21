@@ -1,6 +1,7 @@
 # Bookd-reactjs
 ## Book'd is a ReactJS Controlled Digital Lending Application.
 
+> Book'd was first imagined using python and flask frameworks...
 > *However,* we soon realized Python could not handle the client's requests as effectively as React.
 
 ------
@@ -14,5 +15,4 @@ Book'd is a scholarly project developed by Brian Arbachouskas and Dylan Barton f
 
 | Version | Details | Date |
 | ------ | ------ | ------ |
-| 1.0 | init | 11/21/21 |
-| Paragraph | Text |
+| 1.0 | final | 11/21/21 |
